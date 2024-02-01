@@ -1,0 +1,81 @@
+//Q1
+db.products.aggregate([
+    {
+        $group: {
+            _id: "$category",
+            totalProducts: { $sum: 1 }
+        }
+    },
+    {
+        $project: {
+            category: "$_id",
+            totalProducts: 1,
+            _id: 0
+        }
+    }
+])
+
+//Q2
+db.products.aggregate([
+    {
+        $group: {
+            _id: "$category",
+            maxPrice: { $max: "$price" }
+        }
+    },
+    {
+        $project: {
+            category: "$_id",
+            maxPrice: 1,
+            _id: 0
+        }
+    }
+])
+
+//Q3
+db.orders.aggregate([
+    {
+        $match: {
+            user: "Ahmed"  
+        }
+    },
+    {
+        $lookup: {
+            from: "products",  
+            localField: "products",  
+            foreignField: "_id", 
+            as: "populatedProducts"
+        }
+    },
+    {
+        $unwind: "$populatedProducts"
+    },
+    {
+        $project: {
+            _id: 0,
+            orderNumber: "$orderNumber",  
+            user: "$user",  
+            product: "$populatedProducts"
+        }
+    }
+])
+ //Q4
+ db.orders.aggregate([
+    {
+        $match: {
+            user: "Ahmed"  
+        }
+    },
+    {
+        $group: {
+            _id: null,
+            maxOrderPrice: { $max: "$price" }
+        }
+    },
+    {
+        $project: {
+            _id: 0,
+            maxOrderPrice: 1
+        }
+    }
+])
